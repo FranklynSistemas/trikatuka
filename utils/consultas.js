@@ -111,7 +111,6 @@ function ActualizaGrupo(data, callback){
 		            if(numAffected){
 		              callback({status:true});
 		            }else{
-		              console.log("Mal");
 		              callback({status:false,info:"ErrorActulizando"});
 		            }
 		        });

@@ -91,7 +91,7 @@ websocket.on('Rechazado',function(){
 	alertify.error('Alguien a rechazado la invitación'); 
 });
 
-websocket.on('error',function(data){
+websocket.on('errorGrupos',function(data){
 	alertify.dialog('alert').set({transition:'flipy',message: "<center style='color:red'>"+data.err+"</center>"}).show(); 
 	
 });

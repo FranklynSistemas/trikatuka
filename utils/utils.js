@@ -101,3 +101,30 @@ function randomColor()
         return '#'+(function lol(m,s,c){return s[m.floor(m.random() * s.length)] +
         (c && lol(m,s,c-1));})(Math,'0123456789ABCDEF',4);
     };
+
+exports.GeneraFechaHora = function(){
+    
+    var fechaHoy = new Date();
+    var MesFechaHoy = fechaHoy.getMonth().toString().length > 1 ? fechaHoy.getMonth() : '0'+(fechaHoy.getMonth()+1);
+    var DiaFechaHoy = fechaHoy.getDate().toString().length > 1 ? fechaHoy.getDate() : '0'+fechaHoy.getDate();
+    var HoraFechaHoy = fechaHoy.getHours().toString().length > 1 ? fechaHoy.getHours() : '0'+fechaHoy.getHours(); 
+    var MinutosFechaHoy = fechaHoy.getMinutes().toString().length > 1 ? fechaHoy.getMinutes() : '0'+fechaHoy.getMinutes(); 
+    var fechaString = fechaHoy.getFullYear()+'-'+MesFechaHoy+'-'+DiaFechaHoy+'T'+HoraFechaHoy+':'+MinutosFechaHoy+'+0500'
+    var fechaColombia = new Date(fechaString);
+
+    var month = new Array();
+    month[0] = "Enero";
+    month[1] = "Febrero";
+    month[2] = "Marzo";
+    month[3] = "Abril";
+    month[4] = "Mayo";
+    month[5] = "Junio";
+    month[6] = "Julio";
+    month[7] = "Agosto";
+    month[8] = "Septiembre";
+    month[9] = "Octubre";
+    month[10] = "Noviembre";
+    month[11] = "Diciembre";
+
+    return   {Fecha : fechaColombia.getDate()+' de '+month[fechaColombia.getMonth()]+' de '+fechaColombia.getFullYear()+' a las '+fechaColombia.getHours()+':'+fechaColombia.getMinutes()+':'+fechaColombia.getSeconds(), FechaUnix: fechaColombia.getTime()};
+}

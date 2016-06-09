@@ -13,6 +13,7 @@ var UserSchema = new Schema({
     }],
     tbEstadisticaG : [{
     	id: Number,
+    	nombreEquipo: String, 
     	fecha: String,
     	participantes: Array,
     	resultado: String

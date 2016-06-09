@@ -105,6 +105,12 @@ $(function(){
       console.log(data);
       if(data.status){
       	window.location.href = "/grupos?type=1&grup="+tokenGrupo;
+      }else if(data.info === 'ErrorActulizando'){
+      	alertify.dialog('alert').set({transition:'slide',title: "<b>¡ Error !</b> " ,message: 'Ocurrio un error al agregar un usuario al grupo, intente nuevamente'}).show(); 
+      }else if(data.info === 'SinCupo'){
+      	alertify.dialog('alert').set({transition:'slide',title: "<b>¡ Error !</b> " ,message: 'El número de integrantes ya se encuentra completo'}).show(); 
+      }else{
+		alertify.dialog('alert').set({transition:'slide',title: "<b>¡ Error !</b> " ,message: 'No se encontro el equipo, intente nuevamente'}).show(); 
       }
     }); 
   }

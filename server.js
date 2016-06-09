@@ -101,6 +101,16 @@ socket.on('newUserPartida',function(data){
       }
     });  
   });
+
+ socket.on('FinPartida',function(data){
+  utilsPartidas.finPartida(data,function(data){
+    if(data.status){
+      console.log(socket.nickname+' ha actualizado sus estadisticas');
+    }else{
+      console.log(socket.nickname+' error');
+    }
+  });
+ });
 //=============================================
 //====================Grupos=================== 
 
@@ -133,7 +143,7 @@ socket.on('newUserPartida',function(data){
                 if(err) throw err;
             });
         }else{
-          socket.emit('error',{err: 'Su equipo aún no está completo'});
+          socket.emit('errorGrupos',{err: 'Su equipo aún no está completo'});
         }
       }
     });
@@ -147,7 +157,7 @@ socket.on('newUserPartida',function(data){
            Partidas.update({"_id" : mongoose.Types.ObjectId(datos._id)},{usuarios: datos.usuarios},{upsert:true},function(Error,numAffected){
                 if(numAffected && datos.usuarios.length === 1){
                 datos.usuarios = [];
-                Partidas.update({"_id" : mongoose.Types.ObjectId(datos._id)},{juego: utils.generaGrilla(),usuarios: datos.usuarios},{upsert:true},function(Error,numAffected){
+                Partidas.update({"_id" : mongoose.Types.ObjectId(datos._id)},{juego: utils.generaGrilla(),usuarios: datos.usuarios, terminada:false},{upsert:true},function(Error,numAffected){
                     if(numAffected){
                       utilsPartidas.actualizaEquipos({equipo1:data.grupos.Equipo,equipo2:data.grupos.Rival},function(result){
                         if(result.status){

@@ -13,7 +13,8 @@ $(function()
 		NomUser = '',
 		tabla = '',
 		newJuego = 30,
-		jugando = false;
+		jugando = false,
+		ArrayUsers=[];
 
 
 
@@ -242,7 +243,7 @@ var websocket = io.connect();
 		reloadTable(data,1);
 		alertify.dialog('alert').set({transition:'slide',title: "<b>El sistema reinicio el juego</b> " ,message: "<h3>Los puntajes quedaron así: </h3>"+tabla}).show(); 
 	});
-*/
+
 function reloadTable(data,tipo){
 		tabla = '';
 		if(tipo===1){
@@ -259,7 +260,7 @@ function reloadTable(data,tipo){
 			};
 		}
 }
-
+*/
 // Función que permite dibujar la cuadricula en el id="Juego" segun la mariz optenida por lib.generaGrilla() del Archivo juego.js
 function DibujaJuego(Juego){
       DomMensajes.html("");
@@ -329,12 +330,15 @@ function timer(){
 	}else{
 		if(!fin){
 			//alertify.alert("<b>Felicitaciones a terminado el juego en: "+horas+":"+minutos+":"+segundos+" y su puntaje fue de: "+Puntaje+"</b>");
-			alertify.dialog('alert').set({transition:'slide',title: "Fin del juego" ,message: "<h3>Los puntajes quedaron así: </h3>"+tabla}).show(); 
+			/*alertify.dialog('alert').set({transition:'slide',title: "Fin del juego" ,message: "<h3>Los puntajes quedaron así: </h3>"+tabla}).show(); 
 			numClick = 0;
 			websocket.emit("ActualizaClicksSala");
 			sound === true ? createjs.Sound.play("tada") : console.log("nosound");
 			fin = true;
 			newGame();
+			*/
+			fin = true;
+			finJuego();
 		}
 	}
 	reloj = horasString+":"+minutosString+":"+segundosString;
@@ -342,37 +346,54 @@ function timer(){
 	setTimeout(function(){timer()},tiempo);
 }
 
-
-$('#Start').click(function(){
-	alertify.confirm("Desea reiniciar el Juego", function(){
-		reiniciaTodo();
-	});
-});
-
-function reiniciaTodo(){
-		numClick=0;
-		Puntaje=0;
-		newJuego=30;
-		Juego = [];
-		DomPuntos.html(Puntaje);	
-		iniciaJuego()
-		DomMensajes.html("");
-		segundos = 00;
-		minutos = 00;
-		horas = 00;
-		fin = false;
-		websocket.emit('reiniciaJuegoSala',{Juego: Juego, Clicks: numClick, id : Myid});		
+function finJuego(){
+	sound === true ? createjs.Sound.play("tada") : console.log("nosound"); 
+	var Equipos	= sumaPuntajes(),
+		Ganador = Equipos.Equipo1.gano ? Equipos.Equipo1 : !Equipos.Equipo1.gano && !Equipos.Equipo2.gano ? 'Empate' : Equipos.Equipo2,
+		msgGanador = Ganador === 'Empate' ? '<h3>Ningun Equipo ganó el resultado es un empate</h3>' : "<h3>El equipo ganador es: "+Ganador.NombreEquipo+" con: "+Ganador.Puntaje+" puntos</h3>",
+		informe = "<h3>Los puntajes quedaron así: </h3>"+tabla+"<br><hr>"+msgGanador+"<br><h3>En 30 segundos el sistema los devolverá a la pagina principal, Gracias por participar</h3>";
+	alertify.dialog('alert').set({transition:'slide',title: "Fin del juego" ,message: informe}).show();
+	websocket.emit('FinPartida',{Equipos: Equipos, idPartida:partida, userId: Myid});
+	direccionar();
 }
 
+function sumaPuntajes(){
+ var equipo1 = {nombre:false,Puntaje:0, usuarios: []},
+ 	 equipo2 = {nombre:false,Puntaje:0, usuarios: []},
+ 	 miEquipo = '';
+ for (i in ArrayUsers){
+ 	if (Myid === ArrayUsers[i].userId){miEquipo=ArrayUsers[i].NombreEquipo};
+ 	if(ArrayUsers[0].idEquipo ===  ArrayUsers[i].idEquipo){
+ 		if(equipo1.nombre === false){equipo1.NombreEquipo = ArrayUsers[i].NombreEquipo; equipo1.nombre=true;}  
+ 		equipo1.Puntaje += ArrayUsers[i].Puntaje;
+ 		equipo1.usuarios.push(ArrayUsers[i]);
+ 	}else{
+ 		if(equipo2.nombre === false){equipo2.NombreEquipo = ArrayUsers[i].NombreEquipo; equipo2.nombre=true;} 
+ 		equipo2.Puntaje += ArrayUsers[i].Puntaje;
+ 		equipo2.usuarios.push(ArrayUsers[i]);
+ 	}
+ }
+ if(equipo1.Puntaje > equipo2.Puntaje){
+ 	equipo1.gano = true;
+ }else if(equipo1.Puntaje === equipo2.Puntaje){
+ 	equipo1.gano = false;
+ 	equipo2.gano = false;
+ }else{
+ 	equipo2.gano = true;
+ }
+ var infoEquipo = equipo1.NombreEquipo === miEquipo ? equipo1 : equipo2; 
 
-function newGame(){
-	if(newJuego>0){
-		DomMensajes.html('<p id="Msg"> El juego se reiniciara automáticamente en: '+newJuego+'</p>');
-		newJuego--;
-		setTimeout(function(){newGame();},1000);
+ return {Equipo1: equipo1, Equipo2: equipo2, miEquipo: infoEquipo};
+}
+
+var contDir = 0;
+function direccionar(){
+	contDir++;
+	if(contDir<=30){
+		setTimeout(function(){direccionar();},1000);
 	}else{
-		reiniciaTodo();
-	}	
+		window.location.href = "/";
+	}
 }
 
 
@@ -385,23 +406,24 @@ window.addEventListener("keydown",function (e) {
 
 
 function dibujaUsuarios(userArray){
-	var html = '',
-		color = '',
+	var color = '',
 		cont = 0;
+		ArrayUsers = userArray;
+		tabla = '';
 	for (var i = userArray.length - 1; i >= 0; i--){
 		cont++;
-			if(userArray[0].NombreEquipo != userArray[i].NombreEquipo){
+			if(userArray[0].idEquipo != userArray[i].idEquipo){
 				color="blue";
 			}else{
 				color="black";
 			}
 		var colorConectado = userArray[i].conectado === 'on' ? 'green' : 'red';
-		html += "<div id='txt'><b id='b' style='color:"+color+"'>"+cont+". "+userArray[i].Nombre+" - "+userArray[i].NombreEquipo+" - "+userArray[i].Puntaje+" - <span style='color:"+colorConectado+"'>"+userArray[i].conectado+"</span></b></div>";
+		tabla += "<div id='txt'><b id='b' style='color:"+color+"'>"+cont+". "+userArray[i].Nombre+" - "+userArray[i].NombreEquipo+" - "+userArray[i].Puntaje+" - <span style='color:"+colorConectado+"'>"+userArray[i].conectado+"</span></b></div>";
 	}
-	$("#Users").html(html);
+	$("#Users").html(tabla);
 }
 
-var conteo = 11;
+var conteo = 21;
 function iniciarJuego(juego){
 	conteo--;
 	if (conteo>0) {

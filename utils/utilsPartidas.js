@@ -11,6 +11,8 @@ var Promo = mongoose.model('promociones');
 var Equipo = mongoose.model('equipos');
 var Partidas = mongoose.model('partidas');
 
+var utils = require('./utils');
+
 exports.guardaUser =  function (data,callback) {
 	Partidas.findOne({"id" : data.partida}, function(err, datos){
 		if(datos){
@@ -118,6 +120,61 @@ exports.actualizaEquipos = function(data, callback){
 	});
 }
 
+exports.finPartida =function(data,callback){
+	Partidas.findOne({id:data.idPartida},function(err,datos){
+		if(datos){
+			if(!datos.terminada){
+				datos.terminada = true;
+				Partidas.update({id:data.idPartida},{terminada: datos.terminada},{upsert:true},function(Error,numAffected){
+			        if(numAffected){
+			          llenaEstadisticas({miEquipo: data.Equipos.miEquipo,userId:data.userId},function(data){
+			          	if(data.status){
+			          		callback(data);
+			          	}else{
+			          		callback({status:false});
+			          	}
+			          });
+			        }else{
+			         callback({status:false});
+			        }	
+				});
+			}else{
+				llenaEstadisticas({miEquipo: data.Equipos.miEquipo,userId:data.userId},function(data){
+					if (data.status) {
+						callback(data);
+					}else{
+						callback({status:false});
+					}
+				});
+			}
+		}else{
+			callback({status:false});
+		}
+	});
+}
+
+function llenaEstadisticas(data,callback){
+	User.findOne({"provider_id" : data.userId},function(err,datos){
+		if(datos){
+			datos.tbEstadisticaG.push({
+				id: datos.tbEstadisticaG.length+1,
+				nombreEquipo: data.miEquipo.NombreEquipo,
+				fecha: utils.GeneraFechaHora().Fecha,
+				participantes: data.miEquipo.usuarios,
+				resultado: data.miEquipo.gano ? 'Ganada' : 'Perdida'
+			});
+			User.update({"provider_id" : data.userId},{tbEstadisticaG: datos.tbEstadisticaG},{upsert:true},function(Error,numAffected){
+		        if(numAffected){
+		          callback({status:true});
+		        }else{
+		          callback({status:false});
+		        }	
+			});
+		}else{
+			callback({status:false,err:err});
+		}
+	});
+}
 
 function ordenarArrayPartida(usr){
   var ArrayOrdenado = usr;

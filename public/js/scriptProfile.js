@@ -47,7 +47,7 @@ function llenaTablas(data){
 function showParticipantes(data){
   var Partic = '<table class="table table-striped"><thead style="background-color: gray;color: white;"><tr><th>Nombre</th><th>Puntos</th></tr></thead><tbody>';
   for(i in data){
-    Partic += '<tr><td>'+data[i].Nombre+'</td><td>'+data[i].Puntos+'</td><tr>';
+    Partic += '<tr><td>'+data[i].Nombre+'</td><td>'+data[i].Puntaje+'</td><tr>';
   }
   Partic += '</tbody></table>';  
   tbPart.html(Partic);
