@@ -80,6 +80,14 @@ router.get('/gameplay',function(req, res, next) {
    res.render('index');
   }
 });
+
+router.get('/estadisticas',function(req, res, next) {
+  if(req.user){
+    res.render('estadisticas',{user:req.user});
+  }else{
+   res.render('index');
+  }
+});
 //Consultas
 router.post('/traeUser', consultas.traeUser);
 router.get('/traeEventos', consultas.traeEventos);
@@ -87,7 +95,7 @@ router.get('/traeEvento', consultas.traeEvento);
 router.post('/creaEquipo', consultas.creaEquipo);
 router.get('/traeGrupos', consultas.traeGrupos);
 router.post('/agregarUser', consultas.agregarUser);
-
+router.get('/traeEstadisticas', consultas.traeEstadisticas);
 
 router.get("*", function(req, res){
 	

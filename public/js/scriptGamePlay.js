@@ -8,7 +8,7 @@ $(function()
 		horas = 1;
 		numExitos = 0,
 		NumNumeros=121,
-		numClick = 0, // Variable que guarda el numero de clicks realizados por el usuario
+		numClick = 120, // Variable que guarda el numero de clicks realizados por el usuario
 		Juego = [], //Guarda toda la matriz del juego
 		NomUser = '',
 		tabla = '',
@@ -136,131 +136,7 @@ var websocket = io.connect();
 		dibujaUsuarios(data.usuarios);
 	});
 
-/*
-	websocket.on('msg',function(data){
-		alertify.alert(data).set({onshow:null, onclose:function(){ jugando=false; fnSalas(); }}); 
-		
-	});
-	var Salas = [],
-		htmlSalas = '';
-	var fnSalas = function(){
-		websocket.emit('TraerSalas');
-		websocket.on('Salas',function(data){
-		htmlSalas = '';
-		Salas = data;
-		for (i  in  Salas){
-			htmlSalas += '<a class="salas" id="'+Salas[i].id+'">'+Salas[i].nombre+'<a><br>';
-		} 
-		if(!jugando){
-			alertify.prompt(htmlSalas, 'Crear Sala', 
-    		function(evt, value){ 
-    			websocket.emit('newSala',{namerom: value, nombre:DomUser.text(),Puntaje: 0, Color: lib.randomColor()});
-    			jugando = true;
-    		}
-		);
-		}
-		$(".salas").click(function() {
-          var oID = $(this).attr("id");
-          console.log(oID);
-          alertify.prompt().close();
-          unir(oID);
-		});
 
-		});
-	}; fnSalas();
-
-
-	websocket.on('newConection',function(data){
-		alertify.success("Bienvenido "+data.Nombre);
-		Myid = data.id;
-		NomUser = data.Nombre;
-    	numClick = data.Clicks;
-    	DomNum.html(numClick+1);
-	})
-
-	function unir(uuid){
-		websocket.emit('ingresaNewUserSala', {id: uuid, nombre: DomUser.text(), Color: lib.randomColor()});
-	}
-
-	websocket.on('inicioJuegoSala',function(data){
-		console.log(data);
-				DibujaJuego(data.juego);
-				Juego = data.juego;
-	});
-
-	websocket.on('UsersSalas',function(data){
-		console.log(data);
-		$("#Users").html("");
-		var cont = 0;
-		for (var i = data.usuarios.length - 1; i >= 0; i--) {
-			cont++;
-			$("#Users").append("<b id='b' style='color:"+data.usuarios[i].Color+"'>"+cont+". "+data.usuarios[i].Nombre+" - "+data.usuarios[i].Puntaje+"</b><br>");
-		};
-		reloadTable(data.usuarios,0);
-		if(data.usuarios.length<=1){
-			iniciaJuego();
-			websocket.emit('IniJuegoSala',{id: data.id, juego: Juego});
-			numClick = 0;
-		}else{
-			websocket.emit('ingresaNewUserSala');
-			websocket.on('inicioJuegoSala',function(juego){
-				DibujaJuego(juego);
-				Juego = juego;
-			});
-		}
-	});
-
-	websocket.on('ActualizaSala',function(data){
-		$("#Users").html("");
-		var cont = 0;
-		for (var i = data.length - 1; i >= 0; i--) {
-			cont++;
-			$("#Users").append("<div id='txt'><b id='b' style='color:"+data[i].Color+"'>"+cont+". "+data[i].Nombre+" - "+data[i].Puntaje+"</b></div>");
-		};
-		reloadTable(data,0);
-	});
-
-	websocket.on('DibujeJuegoSala',function(data){
-		Juego = data.Juego;
-		numClick = data.Clicks;
-		DibujaJuego(Juego);
-	})
-
-	websocket.on("DesconectadoSala",function(info){
-		alertify.error("El usuario: "+info+" se a desconectado");
-	});
-
-	websocket.on("PuntuaSala",function(info){
-		alertify.error("El usuario: "+info+" ¡Puntua!");
-	});
-
-	websocket.on("BorraPuntajesSala",function(){
-		Puntaje = 0;
-		DomPuntos.html(Puntaje);
-	});
-
-	websocket.on("SeReiniciaJuegoSala",function(data){
-		reloadTable(data,1);
-		alertify.dialog('alert').set({transition:'slide',title: "<b>El sistema reinicio el juego</b> " ,message: "<h3>Los puntajes quedaron así: </h3>"+tabla}).show(); 
-	});
-
-function reloadTable(data,tipo){
-		tabla = '';
-		if(tipo===1){
-			var cont = 0;
-			for (var i = data.usuarios.length - 1; i >= 0; i--) {
-				cont++;
-				tabla += "<p>"+cont+". "+data.usuarios[i].Nombre+" - "+data.usuarios[i].Puntaje+"</p>";
-			};
-		}else{
-			var cont = 0;
-			for (var i = data.length - 1; i >= 0; i--) {
-				cont++;
-				tabla += "<p>"+cont+". "+data[i].Nombre+" - "+data[i].Puntaje+"</p>";
-			};
-		}
-}
-*/
 // Función que permite dibujar la cuadricula en el id="Juego" segun la mariz optenida por lib.generaGrilla() del Archivo juego.js
 function DibujaJuego(Juego){
       DomMensajes.html("");
@@ -353,7 +229,7 @@ function finJuego(){
 		msgGanador = Ganador === 'Empate' ? '<h3>Ningun Equipo ganó el resultado es un empate</h3>' : "<h3>El equipo ganador es: "+Ganador.NombreEquipo+" con: "+Ganador.Puntaje+" puntos</h3>",
 		informe = "<h3>Los puntajes quedaron así: </h3>"+tabla+"<br><hr>"+msgGanador+"<br><h3>En 30 segundos el sistema los devolverá a la pagina principal, Gracias por participar</h3>";
 	alertify.dialog('alert').set({transition:'slide',title: "Fin del juego" ,message: informe}).show();
-	websocket.emit('FinPartida',{Equipos: Equipos, idPartida:partida, userId: Myid});
+	websocket.emit('FinPartida',{Equipos: Equipos, idPartida:partida, userId: Myid, grupo: grupo});
 	direccionar();
 }
 
@@ -392,7 +268,7 @@ function direccionar(){
 	if(contDir<=30){
 		setTimeout(function(){direccionar();},1000);
 	}else{
-		window.location.href = "/";
+		window.location.href = "/profile";
 	}
 }
 

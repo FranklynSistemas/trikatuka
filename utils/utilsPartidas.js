@@ -127,9 +127,15 @@ exports.finPartida =function(data,callback){
 				datos.terminada = true;
 				Partidas.update({id:data.idPartida},{terminada: datos.terminada},{upsert:true},function(Error,numAffected){
 			        if(numAffected){
-			          llenaEstadisticas({miEquipo: data.Equipos.miEquipo,userId:data.userId},function(data){
-			          	if(data.status){
-			          		callback(data);
+			          llenaEstadisticas({miEquipo: data.Equipos.miEquipo,userId:data.userId},function(result){
+			          	if(result.status){
+			          		Equipo.update({"id" : data.grupo},{$set: {"gano":data.Equipos.miEquipo.gano,"puntaje": data.Equipos.miEquipo.Puntaje}},{upsert:true},function(Error,numAffected){
+						        if(numAffected){
+						          callback(result);
+						        }else{
+						          callback({status:false});
+						        }
+							});
 			          	}else{
 			          		callback({status:false});
 			          	}
@@ -154,16 +160,28 @@ exports.finPartida =function(data,callback){
 }
 
 function llenaEstadisticas(data,callback){
+	var tbActualizar = {};
 	User.findOne({"provider_id" : data.userId},function(err,datos){
 		if(datos){
-			datos.tbEstadisticaG.push({
+			if(data.miEquipo.usuarios.length === 1){
+				datos.tbEstadisticaI.push({
+					id: datos.tbEstadisticaI.length+1,
+					nombreEquipo: data.miEquipo.NombreEquipo,
+					fecha: utils.GeneraFechaHora().Fecha,
+					resultado: data.miEquipo.gano ? 'Ganada' : 'Perdida'
+				});
+				tbActualizar = {tbEstadisticaI : datos.tbEstadisticaI};
+			}else{
+				datos.tbEstadisticaG.push({
 				id: datos.tbEstadisticaG.length+1,
 				nombreEquipo: data.miEquipo.NombreEquipo,
 				fecha: utils.GeneraFechaHora().Fecha,
 				participantes: data.miEquipo.usuarios,
 				resultado: data.miEquipo.gano ? 'Ganada' : 'Perdida'
 			});
-			User.update({"provider_id" : data.userId},{tbEstadisticaG: datos.tbEstadisticaG},{upsert:true},function(Error,numAffected){
+				tbActualizar = {tbEstadisticaG : datos.tbEstadisticaG};
+			}
+			User.update({"provider_id" : data.userId},tbActualizar,{upsert:true},function(Error,numAffected){
 		        if(numAffected){
 		          callback({status:true});
 		        }else{

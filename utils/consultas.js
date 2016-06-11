@@ -57,7 +57,8 @@ exports.creaEquipo = function(req, res){
     			creador: req.body.userId,
     			numJugadores: req.body.numPart,
     			puntaje: 0,
-    			jugando: false
+    			jugando: false,
+    			gano: false
             });
             equipo.save(function(err) {
                 if(err) throw err;
@@ -138,5 +139,26 @@ exports.gruposCompletos = function(callback){
 			callback({err:err});
 		}
 		
+	});
+}
+
+exports.traeEstadisticas = function(req, res){
+	var result = [];
+	Equipo.find({},function(err,equipos){
+		User.populate(equipos,{path:"creador"},function(err,usuarios){
+			Promo.populate(usuarios,{path:"evento"},function(err,response){
+				if(response){
+					for(i in response){
+						if(response[i].gano){
+							result.push(response[i]);
+						}
+					}
+					res.status(200).json(result);
+				}else{
+					res.json({status:false});
+				}
+			});	
+		});
+
 	});
 }

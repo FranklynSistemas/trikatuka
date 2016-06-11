@@ -27,7 +27,7 @@ var io= require('socket.io').listen(httpServer);
 io.set('log level',1);
 
 
-mongoose.connect('mongodb://localhost/trikatuka', 
+mongoose.connect('mongodb://104.154.27.25:80/trikatuka', 
   function(err, res) {
     if(err) throw err;
     console.log('Conectado con exito a la BD');

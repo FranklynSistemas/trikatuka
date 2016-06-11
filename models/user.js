@@ -8,6 +8,7 @@ var UserSchema = new Schema({
     createdAt: {type: Date, default: Date.now},
     tbEstadisticaI : [{
     	id: Number,
+        nombreEquipo: String,
     	fecha: String,
     	resultado: String
     }],
