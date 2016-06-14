@@ -8,7 +8,7 @@ $(function()
 		horas = 1;
 		numExitos = 0,
 		NumNumeros=121,
-		numClick = 120, // Variable que guarda el numero de clicks realizados por el usuario
+		numClick = 0, // Variable que guarda el numero de clicks realizados por el usuario
 		Juego = [], //Guarda toda la matriz del juego
 		NomUser = '',
 		tabla = '',

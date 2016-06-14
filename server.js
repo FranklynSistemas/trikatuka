@@ -8,6 +8,9 @@ var session = require('express-session');
 var httpServer = require("http").createServer(app);
 httpServer.listen(3000);
 
+var multipart = require('connect-multiparty');
+app.use(multipart()) //Express 4
+
 // Login Facebook 
 var mongoose = require('mongoose');
 var passport = require('passport');

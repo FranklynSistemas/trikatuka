@@ -18,8 +18,8 @@ var UserSchema = new Schema({
     	fecha: String,
     	participantes: Array,
     	resultado: String
-    }]
-
+    }],
+    rol: String
 });
 
 var User = mongoose.model('user', UserSchema);

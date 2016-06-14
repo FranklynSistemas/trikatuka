@@ -36,10 +36,17 @@ router.get('/juego', function(req, res, next) {
 
 router.get('/profile', function(req, res, next) {
 if(req.user){
-	res.render('profile',{
-  	title: 'Perfil',
-  	user: req.user
-  });
+  if(req.user.rol != 'user'){
+    res.render('profileAdmin',{
+      title: 'Perfil',
+      user: req.user
+    });
+  }else{
+    res.render('profile',{
+      title: 'Perfil',
+      user: req.user
+    });
+  }
 }else{
 	res.render('index');
 }
@@ -90,12 +97,18 @@ router.get('/estadisticas',function(req, res, next) {
 });
 //Consultas
 router.post('/traeUser', consultas.traeUser);
+router.get('/traeUsers', consultas.traeUsers);
+router.post('/editarUser', consultas.editarUser);
 router.get('/traeEventos', consultas.traeEventos);
 router.get('/traeEvento', consultas.traeEvento);
+router.post('/crearEvento', consultas.crearEvento);
+router.post('/editarEvento', consultas.editarEvento);
 router.post('/creaEquipo', consultas.creaEquipo);
 router.get('/traeGrupos', consultas.traeGrupos);
 router.post('/agregarUser', consultas.agregarUser);
 router.get('/traeEstadisticas', consultas.traeEstadisticas);
+
+router.post('/upload',consultas.Uploads);
 
 router.get("*", function(req, res){
 	

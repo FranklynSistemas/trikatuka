@@ -30,7 +30,8 @@ module.exports = function(passport) {
                 provider: profile.provider,
                 name: profile.displayName,
                 tbEstadisticaI: [],
-                tbEstadisticaG: []
+                tbEstadisticaG: [],
+                rol: 'user'
             });
             user.save(function(err) {
                 if(err) throw err;

@@ -26,7 +26,7 @@ function traeEventos(){
 function llenaTablas(data){
   var html = '<table class="table"><tbody>';
   for(i in data){
-    html += '<tr><td><a href="/traeEvento?id='+data[i]._id+'"><img src="img/'+data[i].img+'"></a></td><tr>';
+    html += '<tr><td><a href="/traeEvento?id='+data[i]._id+'"><img src="img/'+data[i].img+'" height="100" width="100%"></a></td><tr>';
   }
   html += '</tbody></table>';  
   tbEventos.html(html);
